@@ -10,6 +10,7 @@ class Server
   end
 
   def send_response(client, args)
+    client.puts args[:headers]
     client.puts args[:output]
     client.close
   end
@@ -17,7 +18,12 @@ class Server
   def build_response_message(client)
     response = "<p>Hello, World (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
-    send_response(client, output: output)
+    headers = ["http/1.1 200 ok",
+              "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
+              "server: ruby",
+              "content-type: text/html; charset=iso-8859-1",
+              "content-length: #{output.length}\r\n\r\n"].join("\r\n")
+    send_response(client, output: output, headers: headers)
   end
 
   def build_request_message(client)
