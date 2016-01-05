@@ -8,7 +8,7 @@ class ServerTest < Minitest::Test
     assert response.success?
   end
 
-  def test_count_starts_at_zero
+  def test_hello_world_count_starts_at_zero
     clear_count
     response = Hurley.get("http://127.0.0.1:9292")
     expected = "<html><head></head><body><p>Hello, World! (0)</p></body></html>"
@@ -16,7 +16,7 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  def test_increments_by_one_after_every_request
+  def test_hello_world_count_increments_by_one_after_every_request
     clear_count
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.get "/"
