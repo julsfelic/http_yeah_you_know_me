@@ -1,48 +1,51 @@
-require 'socket'
 require 'pry'
+require 'socket'
 
 class Server
-  attr_reader :tcp_server, :count
+  attr_reader :tcp_server, :client, :count
 
-  def initialize(port = 9292)
-    @tcp_server = TCPServer.open(port)
+  def initialize
+    @tcp_server = TCPServer.new(9292)
+    @client = nil
     @count = 0
   end
 
-  def send_response(client, args)
-    client.puts args[:headers]
-    client.puts args[:output]
+  def send_response(headers, output)
+    client.puts headers
+    client.puts output
     client.close
+    @count += 1
   end
 
-  def build_response_message(client)
-    response = "<p>Hello, World (#{count})</p>"
+  def format_response(request_lines)
+    @count = -1 if request_lines[0].include? "/clear_count"
+    response = "<p>Hello, World! (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
-              "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-              "server: ruby",
-              "content-type: text/html; charset=iso-8859-1",
-              "content-length: #{output.length}\r\n\r\n"].join("\r\n")
-    send_response(client, output: output, headers: headers)
+               "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
+               "server: ruby",
+               "content-type: text/html; charset=iso-8859-1",
+               "content-length: #{output.length}\r\n\r\n"].join("\r\n")
+    send_response(headers, output)
   end
 
-  def build_request_message(client)
+  def parse_request
     request_lines = []
     while line = client.gets and !line.chomp.empty?
       request_lines << line.chomp
     end
-    build_response_message(client)
+    format_response(request_lines)
   end
 
-  def accept
+  def start_server
     loop do
-      build_request_message(tcp_server.accept)
-      @count += 1
+      @client = tcp_server.accept
+      parse_request
     end
   end
 end
 
 if __FILE__ == $PROGRAM_NAME
-  server = Server.new(9292)
-  server.accept
+  server = Server.new
+  server.start_server
 end
