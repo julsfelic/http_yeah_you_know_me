@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class ServerTest < Minitest::Test
+
   def test_gives_a_successfull_response
     response = Hurley.get("http://127.0.0.1:9292")
 
