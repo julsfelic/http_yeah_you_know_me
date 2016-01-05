@@ -17,8 +17,13 @@ class Server
     @count += 1
   end
 
+  def reset_count
+    @count = -1
+  end
+
   def format_response(request_lines)
-    @count = -1 if request_lines[0].include? "/clear_count"
+    reset_count if request_lines[0].include? "/clear_count"
+
     response = "<p>Hello, World! (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
