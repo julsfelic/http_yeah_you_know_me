@@ -2,25 +2,20 @@ require 'socket'
 require 'pry'
 
 class Server
-  attr_reader :tcp_server
+  attr_reader :tcp_server, :count
 
   def initialize(port = 9292)
-    @tcp_server = TCPServer.new(port)
+    @tcp_server = TCPServer.open(port)
     @count = 0
   end
 
   def send_response(client, args)
-      client.puts args[:output]
-
-    # if var == quit
-    # client.close
-    # else
-    # accept
-    # end
+    client.puts args[:output]
+    client.close
   end
 
   def build_response_message(client)
-    response = "<p>Hello, World (0)</p>"
+    response = "<p>Hello, World (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
     send_response(client, output: output)
   end
@@ -34,9 +29,11 @@ class Server
   end
 
   def accept
-    build_request_message(tcp_server.accept)
+    loop do
+      build_request_message(tcp_server.accept)
+      @count += 1
+    end
   end
-
 end
 
 if __FILE__ == $PROGRAM_NAME
