@@ -2,3 +2,6 @@ language: ruby
 script: bundle exec mrspec --color
 rvm:
   - 2.2.2
+  addons:
+    code_climate:
+        repo_token: 2bbafe174f280b47a5f83d9fbd00bead645730fe64551b78e59ecb416bd474fb
