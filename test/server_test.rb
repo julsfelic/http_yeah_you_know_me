@@ -74,4 +74,21 @@ class ServerTest < Minitest::Test
 
     assert_equal expected, response.body
   end
+
+  def test_outputs_total_requests_when_shutdown_is_requested
+    # going to need another helper for clearing request count
+    response = Hurley.get("http://127.0.0.1:9292/shutdown")
+    expected = "<html><head></head><body><p>Total Requests: 1</p></body></html>"
+
+    assert_equal expected, response.body
+  end
+
+  def test_increments_total_requests_after_each_requests
+    skip
+    client = Hurley::Client.new "http://127.0.0.1:9292"
+    client.get "/"
+    client.get "/hello"
+    client.get "/datetime"
+    response = client.get ""
+  end
 end

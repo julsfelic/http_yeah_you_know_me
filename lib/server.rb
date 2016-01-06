@@ -2,12 +2,13 @@ require "pry"
 require "socket"
 
 class Server
-  attr_reader :tcp_server, :client, :count
+  attr_reader :tcp_server, :client, :count, :request_count
 
   def initialize
     @tcp_server = TCPServer.new(9292)
     @client = nil
     @count = 0
+    @request_count = 1
   end
 
   def send_response(headers, output)
@@ -46,6 +47,8 @@ class Server
     elsif path == "/datetime"
       datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
       response = "<p>#{datetime}</p>"
+    elsif path == "/shutdown"
+      response = "<p>Total Requests: #{request_count}</p>"
     end
 
     # response = ???
