@@ -2,6 +2,10 @@ require 'test_helper'
 
 class ServerTest < Minitest::Test
 
+  def self.test_order
+    :alpha
+  end
+
   def test_gives_a_successfull_response
     response = Hurley.get("http://127.0.0.1:9292")
 
@@ -75,20 +79,32 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  def test_outputs_total_requests_when_shutdown_is_requested
-    # going to need another helper for clearing request count
-    response = Hurley.get("http://127.0.0.1:9292/shutdown")
-    expected = "<html><head></head><body><p>Total Requests: 1</p></body></html>"
-
-    assert_equal expected, response.body
-  end
-
-  def test_increments_total_requests_after_each_requests
-    skip
+  # def test_outputs_total_requests_when_shutdown_is_requested
+  #   clear_count
+  #   response = Hurley.get("http://127.0.0.1:9292/shutdown")
+  #   expected = "<html><head></head><body><p>Total Requests: 1</p></body></html>"
+  #
+  #   assert_equal expected, response.body
+  # end
+#
+#   def test_increments_total_requests_after_each_request
+#     clear_count
+#     client = Hurley::Client.new "http://127.0.0.1:9292"
+#     client.get "/"
+#     client.get "/hello"
+#     client.get "/datetime"
+#     response = client.get "/shutdown"
+#     expected = "<html><head></head><body><p>Total Requests: 4</p></body></html>"
+#
+#     assert_equal expected, response.body
+#   end
+#
+  def test_server_shuts_down_after_a_shutdown_request
     client = Hurley::Client.new "http://127.0.0.1:9292"
-    client.get "/"
-    client.get "/hello"
-    client.get "/datetime"
-    response = client.get ""
+    client.get "/shutdown"
+    
+    assert_raises Hurley::ConnectionFailed do
+      client.get "/hello"
+    end
   end
 end

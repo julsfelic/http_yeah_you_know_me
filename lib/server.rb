@@ -2,23 +2,26 @@ require "pry"
 require "socket"
 
 class Server
-  attr_reader :tcp_server, :client, :count, :request_count
+  attr_reader :tcp_server, :client, :hello_count, :request_count
 
   def initialize
     @tcp_server = TCPServer.new(9292)
     @client = nil
-    @count = 0
-    @request_count = 1
+    @hello_count = 0
+    @request_count = 0
   end
 
-  def send_response(headers, output)
-    client.puts headers
-    client.puts output
+  def send_response(args)
+    client.puts args[:headers]
+    client.puts args[:output]
     client.close
+    # tcp server close if some value equal true
+    tcp_server.close if args[:close_server]
   end
 
   def reset_count
-    @count = 0
+    @hello_count = 0
+    @request_count = 0
   end
 
   def diagnostic_template(normalized_lines)
@@ -36,12 +39,14 @@ class Server
   def format_response(normalized_lines)
     response = ""
     path = normalized_lines[1][1]
+    @request_count += 1
+    close_server = false
     # think of using a hash instead of an if statement?
     if path == "/"
       response = "#{diagnostic_template(normalized_lines)}"
     elsif path == "/hello"
-      response = "<p>Hello, World! (#{count})</p>"
-      @count += 1
+      response = "<p>Hello, World! (#{hello_count})</p>"
+      @hello_count += 1
     elsif path == "/clear_count"
       reset_count
     elsif path == "/datetime"
@@ -49,6 +54,7 @@ class Server
       response = "<p>#{datetime}</p>"
     elsif path == "/shutdown"
       response = "<p>Total Requests: #{request_count}</p>"
+      close_server = true
     end
 
     # response = ???
@@ -58,7 +64,7 @@ class Server
                "server: ruby",
                "content-type: text/html; charset=iso-8859-1",
                "content-length: #{output.length}\r\n\r\n"].join("\r\n")
-    send_response(headers, output)
+    send_response(close_server: close_server, output: output, headers: headers)
   end
 
   def normalize_request(request_lines)
