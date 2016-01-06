@@ -30,7 +30,7 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  def test_outputs_formatted_diagnostic
+  def test_outputs_formatted_diagnostic_when_root_is_requested
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.header[:accept] = "text/html,application/xhtml+xml,application/xml;" \
                              "q=0.9,image/webp,*/*;q=0.8"

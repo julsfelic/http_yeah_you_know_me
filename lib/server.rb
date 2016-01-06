@@ -34,7 +34,14 @@ class Server
   end
 
   def format_response(normalized_lines)
-    response = "#{diagnostic_template(normalized_lines)}"
+    response = ""
+    path = normalized_lines[1][1]
+
+    if path == "/"
+      response = "#{diagnostic_template(normalized_lines)}"
+    end
+    # lump in /reset_count
+    # response = ???
     reset_count if normalized_lines[1][1].include? "/clear_count"
     output = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
@@ -47,12 +54,12 @@ class Server
 
   def normalize_request(request_lines)
     keys = ["HTTP/1.1", "Host", "Accept:"]
-    formatted_lines = request_lines.select do |e|
+    formatted_lines = request_lines.select do |line|
       keys.any? do |key|
-        e.include?(key)
+        line.include?(key)
       end
     end
-    formatted_lines.map { |e| e.split(" ") }.sort
+    formatted_lines.map { |line| line.split(" ") }.sort
   end
 
   def parse_request
