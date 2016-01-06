@@ -31,10 +31,14 @@ class ServerTest < Minitest::Test
   end
 
   def test_outputs_formatted_diagnostic
-    response = Hurley.get("http://127.0.0.1:9292")
+    client = Hurley::Client.new "http://127.0.0.1:9292"
+    client.header[:accept] = "text/html,application/xhtml+xml,application/xml;" +
+                             "q=0.9,image/webp,*/*;q=0.8"
+    response = client.get "/"
+    # set accept before response
     expected = "<html><head></head><body>" +
                "<pre>" +
-               "Verb: POST\n" +
+               "Verb: GET\n" +
                "Path: /\n" +
                "Protocol: HTTP/1.1\n" +
                "Host: 127.0.0.1\n" +

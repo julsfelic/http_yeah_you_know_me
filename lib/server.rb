@@ -22,9 +22,11 @@ class Server
   end
 
   def format_response(request_lines)
+    response = "#{diagnostic_template(request_lines)}"
+
     reset_count if request_lines[0].include? "/clear_count"
 
-    response = "<p>Hello, World! (#{count})</p>"
+    # response = "<p>Hello, World! (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
@@ -34,12 +36,31 @@ class Server
     send_response(headers, output)
   end
 
+  def diagnostic_template(request_lines)
+    formatted_lines = request_lines.map { |e| e.split(" ") }.sort
+    "<pre>" +
+    "Verb: #{formatted_lines[1][0]}\n" +
+    "Path: #{formatted_lines[1][1]}\n" +
+    "Protocol: #{formatted_lines[1][2]}\n" +
+    "Host: #{formatted_lines.last[1].split(":")[0]}\n" +
+    "Port: #{formatted_lines.last[1].split(":")[1]}\n" +
+    "Origin: #{formatted_lines.last[1].split(":")[0]}\n" +
+    "Accept: #{formatted_lines[0][1]}" +
+    "</pre>"
+  end
+
   def parse_request
     request_lines = []
     while line = client.gets and !line.chomp.empty?
       request_lines << line.chomp
     end
-    format_response(request_lines)
+    keys = ["HTTP/1.1", "Host", "Accept:"]
+    formatted_lines = request_lines.select do |e|
+      keys.any? do |key|
+        e.include?(key)
+      end
+    end
+    format_response(formatted_lines)
   end
 
   def start_server
