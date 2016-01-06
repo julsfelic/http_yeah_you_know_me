@@ -41,24 +41,6 @@ class Server
       "Accept: #{normalized_lines[0][1]}" \
     "</pre>"
   end
-  # ResponseHandler
-  def check_path(normalized_lines)
-    path = normalized_lines[1][1]
-    if path == "/"
-      "#{diagnostic_template(normalized_lines)}"
-    elsif path == "/hello"
-      @hello_count += 1
-      "<p>Hello, World! (#{hello_count - 1})</p>"
-    elsif path == "/clear_count"
-      reset_count
-    elsif path == "/datetime"
-      datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
-      "<p>#{datetime}</p>"
-    elsif path == "/shutdown"
-      @close_server = true
-      "<p>Total Requests: #{request_count}</p>"
-    end
-  end
 
   # Server
   def start_server
