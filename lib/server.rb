@@ -2,9 +2,10 @@ $LOAD_PATH.unshift(File.expand_path(".", __dir__))
 require "pry"
 require "socket"
 require 'request_handler'
+require 'response_handler'
 
 class Server
-  include RequestHandler
+  include RequestHandler, ResponseHandler
 
   attr_reader :tcp_server, :client, :hello_count, :request_count, :close_server
 
@@ -58,21 +59,7 @@ class Server
       "<p>Total Requests: #{request_count}</p>"
     end
   end
-  # ResponseHandler
-  def format_response(normalized_lines)
-    @request_count += 1
-    # think of using a hash instead of an if statement?
-    response = check_path(normalized_lines)
 
-    # response = ???
-    output  = "<html><head></head><body>#{response}</body></html>"
-    headers = ["http/1.1 200 ok",
-               "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-               "server: ruby",
-               "content-type: text/html; charset=iso-8859-1",
-               "content-length: #{output.length}\r\n\r\n"].join("\r\n")
-    send_response(output: output, headers: headers)
-  end
   # Server
   def start_server
     loop do
