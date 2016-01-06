@@ -66,4 +66,12 @@ class ServerTest < Minitest::Test
 
     assert_equal expected, response.body
   end
+
+  def test_outputs_formatted_date_when_datetime_is_requested
+    response = Hurley.get("http://127.0.0.1:9292/datetime")
+    expected_time = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
+    expected = "<html><head></head><body><p>#{expected_time}</p></body></html>"
+
+    assert_equal expected, response.body
+  end
 end

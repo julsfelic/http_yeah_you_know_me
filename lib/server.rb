@@ -43,6 +43,9 @@ class Server
       @count += 1
     elsif path == "/clear_count"
       reset_count
+    elsif path == "/datetime"
+      datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
+      response = "<p>#{datetime}</p>"
     end
 
     # response = ???
