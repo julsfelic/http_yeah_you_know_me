@@ -16,33 +16,19 @@ class Server
     @request_count  = 0
     @close_server   = false
   end
-  # Server
+
   def send_response(args)
     client.puts args[:headers]
     client.puts args[:output]
     client.close
-    # tcp server close if some value equal true
     tcp_server.close if close_server
   end
-  # Server
+
   def reset_count
     @hello_count = 0
     @request_count = 0
   end
-  # ResponseHandler
-  # def diagnostic_template(normalized_lines)
-  #   "<pre>" \
-  #     "Verb: #{normalized_lines[1][0]}\n" \
-  #     "Path: #{normalized_lines[1][1]}\n" \
-  #     "Protocol: #{normalized_lines[1][2]}\n" \
-  #     "Host: #{normalized_lines.last[1].split(':')[0]}\n" \
-  #     "Port: #{normalized_lines.last[1].split(':')[1]}\n" \
-  #     "Origin: #{normalized_lines.last[1].split(':')[0]}\n" \
-  #     "Accept: #{normalized_lines[0][1]}" \
-  #   "</pre>"
-  # end
 
-  # Server
   def start_server
     loop do
       @client = tcp_server.accept
