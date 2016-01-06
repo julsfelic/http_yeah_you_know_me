@@ -1,5 +1,17 @@
 module ResponseHandler
 
+  def diagnostic_template(normalized_lines)
+    "<pre>" \
+      "Verb: #{normalized_lines[1][0]}\n" \
+      "Path: #{normalized_lines[1][1]}\n" \
+      "Protocol: #{normalized_lines[1][2]}\n" \
+      "Host: #{normalized_lines.last[1].split(':')[0]}\n" \
+      "Port: #{normalized_lines.last[1].split(':')[1]}\n" \
+      "Origin: #{normalized_lines.last[1].split(':')[0]}\n" \
+      "Accept: #{normalized_lines[0][1]}" \
+    "</pre>"
+  end
+
   def check_path(normalized_lines)
     path = normalized_lines[1][1]
     if path == "/"
