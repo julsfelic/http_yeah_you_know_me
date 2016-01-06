@@ -21,10 +21,9 @@ class Server
     @count = -1
   end
 
-  def format_response(request_lines)
-    response = "#{diagnostic_template(request_lines)}"
-
-    reset_count if request_lines[0].include? "/clear_count"
+  def format_response(normalized_lines)
+    response = "#{diagnostic_template(normalized_lines)}"
+    reset_count if normalized_lines[1][1].include? "/clear_count"
 
     # response = "<p>Hello, World! (#{count})</p>"
     output = "<html><head></head><body>#{response}</body></html>"
@@ -35,32 +34,42 @@ class Server
                "content-length: #{output.length}\r\n\r\n"].join("\r\n")
     send_response(headers, output)
   end
+  #
+  # def format_lines(request_lines)
+  #   request_lines.map { |e| e.split(" ") }.sort
+  # end
 
-  def diagnostic_template(request_lines)
-    formatted_lines = request_lines.map { |e| e.split(" ") }.sort
+  def diagnostic_template(normalized_lines)
+    # formatted_lines = format_lines(request_lines)
     "<pre>" +
-    "Verb: #{formatted_lines[1][0]}\n" +
-    "Path: #{formatted_lines[1][1]}\n" +
-    "Protocol: #{formatted_lines[1][2]}\n" +
-    "Host: #{formatted_lines.last[1].split(":")[0]}\n" +
-    "Port: #{formatted_lines.last[1].split(":")[1]}\n" +
-    "Origin: #{formatted_lines.last[1].split(":")[0]}\n" +
-    "Accept: #{formatted_lines[0][1]}" +
+    "Verb: #{normalized_lines[1][0]}\n" +
+    "Path: #{normalized_lines[1][1]}\n" +
+    "Protocol: #{normalized_lines[1][2]}\n" +
+    "Host: #{normalized_lines.last[1].split(":")[0]}\n" +
+    "Port: #{normalized_lines.last[1].split(":")[1]}\n" +
+    "Origin: #{normalized_lines.last[1].split(":")[0]}\n" +
+    "Accept: #{normalized_lines[0][1]}" +
     "</pre>"
   end
 
-  def parse_request
-    request_lines = []
-    while line = client.gets and !line.chomp.empty?
-      request_lines << line.chomp
-    end
+  def normalize_request(request_lines)
     keys = ["HTTP/1.1", "Host", "Accept:"]
     formatted_lines = request_lines.select do |e|
       keys.any? do |key|
         e.include?(key)
       end
     end
-    format_response(formatted_lines)
+    formatted_lines.map { |e| e.split(" ") }.sort
+  end
+
+
+  def parse_request
+    request_lines = []
+    while line = client.gets and !line.chomp.empty?
+      request_lines << line.chomp
+    end
+    normalized_lines = normalize_request(request_lines)
+    format_response(normalized_lines)
   end
 
   def start_server
