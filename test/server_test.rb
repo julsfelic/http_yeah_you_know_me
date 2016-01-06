@@ -8,28 +8,6 @@ class ServerTest < Minitest::Test
     assert response.success?
   end
 
-  def test_hello_world_count_starts_at_zero
-    skip
-    clear_count
-    response = Hurley.get("http://127.0.0.1:9292")
-    expected = "<html><head></head><body><p>Hello, World! (0)</p></body></html>"
-
-    assert_equal expected, response.body
-  end
-
-  def test_hello_world_count_increments_by_one_after_every_request
-    skip
-    clear_count
-    client = Hurley::Client.new "http://127.0.0.1:9292"
-    client.get "/"
-    client.get "/"
-    client.get "/"
-    response = client.get "/"
-    expected = "<html><head></head><body><p>Hello, World! (3)</p></body></html>"
-
-    assert_equal expected, response.body
-  end
-
   def test_outputs_formatted_diagnostic_when_root_is_requested
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.header[:accept] = "text/html,application/xhtml+xml,application/xml;" \
@@ -47,6 +25,44 @@ class ServerTest < Minitest::Test
                "Accept: text/html,application/xhtml+xml,application/xml;" \
                "q=0.9,image/webp,*/*;q=0.8" \
                "</pre></body></html>"
+
+    assert_equal expected, response.body
+  end
+
+  def test_outputs_hello_world_when_hello_is_requested
+    clear_count
+    response = Hurley.get("http://127.0.0.1:9292/hello")
+    expected = "<html><head></head><body><p>Hello, World! (0)</p></body></html>"
+
+    assert_equal expected, response.body
+  end
+
+  def test_increments_hello_world_count_by_one_after_every_request
+    clear_count
+    client = Hurley::Client.new "http://127.0.0.1:9292"
+    client.get "/hello"
+    client.get "/hello"
+    client.get "/hello"
+    response = client.get "/hello"
+    expected = "<html><head></head><body><p>Hello, World! (3)</p></body></html>"
+
+    assert_equal expected, response.body
+  end
+
+  def test_only_increments_for_hello_world_request
+    clear_count
+    client = Hurley::Client.new "http://127.0.0.1:9292"
+    client.get "/hello"
+    client.get "/hello"
+    response = client.get "/hello"
+    expected = "<html><head></head><body><p>Hello, World! (2)</p></body></html>"
+
+    assert_equal expected, response.body
+
+    client.get "/"
+    client.get "/"
+    response = client.get "/hello"
+    expected = "<html><head></head><body><p>Hello, World! (3)</p></body></html>"
 
     assert_equal expected, response.body
   end

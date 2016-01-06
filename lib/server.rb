@@ -14,11 +14,10 @@ class Server
     client.puts headers
     client.puts output
     client.close
-    @count += 1
   end
 
   def reset_count
-    @count = -1
+    @count = 0
   end
 
   def diagnostic_template(normalized_lines)
@@ -36,13 +35,17 @@ class Server
   def format_response(normalized_lines)
     response = ""
     path = normalized_lines[1][1]
-
+    # think of using a hash instead of an if statement?
     if path == "/"
       response = "#{diagnostic_template(normalized_lines)}"
+    elsif path == "/hello"
+      response = "<p>Hello, World! (#{count})</p>"
+      @count += 1
+    elsif path == "/clear_count"
+      reset_count
     end
-    # lump in /reset_count
+
     # response = ???
-    reset_count if normalized_lines[1][1].include? "/clear_count"
     output = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
