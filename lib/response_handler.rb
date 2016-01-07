@@ -15,8 +15,12 @@ module ResponseHandler
   end
 
   def search_word(path)
+    # get word?????
     word = path.split("=").last
+    # dictionary method
     dictionary = File.read("/usr/share/dict/words").split("\n")
+    # maybe have getting the word together with finding word
+    # find word method?, get rid of found and return value
     found = dictionary.any? { |dict_word| word == dict_word }
     if found
       "<p>#{word} is a known word</p>"
@@ -26,6 +30,11 @@ module ResponseHandler
   end
 
   def check_path(response)
+    # get path string
+    # remove backslash
+    # convert to a sym
+    # just call send with sym
+    # break out into small methods named after the path
     if response.path == "/"
       "#{diagnostic_template(response)}"
     elsif response.path == "/hello"
@@ -47,11 +56,12 @@ module ResponseHandler
   def format_response(formatted_lines)
     response = Response.new
     response.process_lines(formatted_lines)
-    response
   end
 
   def process_response(request)
+    # should probably be named response
     formatted_response = format_response(request)
+    # maybe flip names
     response = check_path(formatted_response)
     output  = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",

@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift(File.expand_path(".", __dir__))
+$LOAD_PATH.unshift(File.dirname(__FILE__))
 require "pry"
 require "socket"
 require 'request_handler'
@@ -21,7 +21,6 @@ class Server
     client.puts args[:headers]
     client.puts args[:output]
     client.close
-    tcp_server.close if close_server
   end
 
   def reset_count
@@ -32,8 +31,7 @@ class Server
   def start_server
     loop do
       @client = tcp_server.accept
-      request = process_request
-      process_response(request)
+      process_response(process_request)
       @request_count += 1
       break if close_server
     end

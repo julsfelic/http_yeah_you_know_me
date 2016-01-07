@@ -102,7 +102,6 @@ class ServerTest < Minitest::Test
   end
 
   def test_server_shuts_down_after_a_shutdown_request
-    skip
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.get "/shutdown"
 

@@ -19,5 +19,6 @@ class Response
     @origin   = host
     @port     = request_lines.last[1].split(':')[1]
     @accept   = request_lines[0][1]
+    self
   end
 end
