@@ -1,38 +1,58 @@
+require 'response'
+
 module ResponseHandler
 
-  def diagnostic_template(normalized_lines)
+  def diagnostic_template(response)
     "<pre>" \
-      "Verb: #{normalized_lines[1][0]}\n" \
-      "Path: #{normalized_lines[1][1]}\n" \
-      "Protocol: #{normalized_lines[1][2]}\n" \
-      "Host: #{normalized_lines.last[1].split(':')[0]}\n" \
-      "Port: #{normalized_lines.last[1].split(':')[1]}\n" \
-      "Origin: #{normalized_lines.last[1].split(':')[0]}\n" \
-      "Accept: #{normalized_lines[0][1]}" \
+      "Verb: #{response.verb}\n" \
+      "Path: #{response.path}\n" \
+      "Protocol: #{response.protocol}\n" \
+      "Host: #{response.host}\n" \
+      "Port: #{response.port}\n" \
+      "Origin: #{response.origin}\n" \
+      "Accept: #{response.accept}" \
     "</pre>"
   end
 
-  def check_path(normalized_lines)
-    path = normalized_lines[1][1]
-    if path == "/"
-      "#{diagnostic_template(normalized_lines)}"
-    elsif path == "/hello"
+  def search_word(path)
+    word = path.split("=").last
+    dictionary = File.read("/usr/share/dict/words").split("\n")
+    found = dictionary.any? { |dict_word| word == dict_word }
+    if found
+      "<p>#{word} is a known word</p>"
+    else
+      "<p>#{word} is not a known word</p>"
+    end
+  end
+
+  def check_path(response)
+    if response.path == "/"
+      "#{diagnostic_template(response)}"
+    elsif response.path == "/hello"
       @hello_count += 1
       "<p>Hello, World! (#{hello_count - 1})</p>"
-    elsif path == "/clear_count"
-      reset_count
-    elsif path == "/datetime"
+    elsif response.path == "/datetime"
       datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
       "<p>#{datetime}</p>"
-    elsif path == "/shutdown"
+    elsif response.path.include?("word_search")
+      search_word(response.path)
+    elsif response.path == "/clear_count"
+      reset_count
+    elsif response.path == "/shutdown"
       @close_server = true
       "<p>Total Requests: #{request_count}</p>"
     end
   end
 
-  def format_response(normalized_lines)
-    @request_count += 1
-    response = check_path(normalized_lines)
+  def format_response(formatted_lines)
+    response = Response.new
+    response.process_lines(formatted_lines)
+    response
+  end
+
+  def process_response(request)
+    formatted_response = format_response(request)
+    response = check_path(formatted_response)
     output  = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
@@ -41,5 +61,4 @@ module ResponseHandler
                "content-length: #{output.length}\r\n\r\n"].join("\r\n")
     send_response(output: output, headers: headers)
   end
-
 end

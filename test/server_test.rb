@@ -79,32 +79,47 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  # def test_outputs_total_requests_when_shutdown_is_requested
-  #   clear_count
-  #   response = Hurley.get("http://127.0.0.1:9292/shutdown")
-  #   expected = "<html><head></head><body><p>Total Requests: 1</p></body></html>"
-  #
-  #   assert_equal expected, response.body
-  # end
-#
-#   def test_increments_total_requests_after_each_request
-#     clear_count
-#     client = Hurley::Client.new "http://127.0.0.1:9292"
-#     client.get "/"
-#     client.get "/hello"
-#     client.get "/datetime"
-#     response = client.get "/shutdown"
-#     expected = "<html><head></head><body><p>Total Requests: 4</p></body></html>"
-#
-#     assert_equal expected, response.body
-#   end
-#
+  def test_outputs_total_requests_when_shutdown_is_requested
+    skip
+    clear_count
+    response = Hurley.get("http://127.0.0.1:9292/shutdown")
+    expected = "<html><head></head><body><p>Total Requests: 1</p></body></html>"
+
+    assert_equal expected, response.body
+  end
+
+  def test_increments_total_requests_after_each_request
+    skip
+    clear_count
+    client = Hurley::Client.new "http://127.0.0.1:9292"
+    client.get "/"
+    client.get "/hello"
+    client.get "/datetime"
+    response = client.get "/shutdown"
+    expected = "<html><head></head><body><p>Total Requests: 4</p></body></html>"
+
+    assert_equal expected, response.body
+  end
+
   def test_server_shuts_down_after_a_shutdown_request
+    skip
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.get "/shutdown"
 
     assert_raises Hurley::ConnectionFailed do
       client.get "/hello"
     end
+  end
+
+  def test_outputs_known_word_when_word_search_path_is_requested
+    response = Hurley.get("http://127.0.0.1:9292/word_search?word=pizza")
+    expected = "<html><head></head><body><p>pizza is a known word</p></body></html>"
+    assert_equal expected, response.body
+  end
+
+  def test_outputs_not_known_when_word_search_path_is_requested
+    response = Hurley.get("http://127.0.0.1:9292/word_search?word=centower")
+    expected = "<html><head></head><body><p>centower is not a known word</p></body></html>"
+    assert_equal expected, response.body
   end
 end

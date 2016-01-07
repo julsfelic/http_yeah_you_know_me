@@ -32,7 +32,10 @@ class Server
   def start_server
     loop do
       @client = tcp_server.accept
-      parse_request
+      request = process_request
+      process_response(request)
+      @request_count += 1
+      break if close_server
     end
   end
 end
