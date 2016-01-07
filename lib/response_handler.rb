@@ -1,14 +1,38 @@
 module ResponseHandler
 
-  def diagnostic_template(normalized_lines)
+  class Response
+    attr_reader :verb, :path, :protocol, :host, :port, :origin, :accept
+
+    def initialize
+      @verb     = ""
+      @path     = ""
+      @protocol = ""
+      @host     = ""
+      @port     = ""
+      @origin   = ""
+      @accept   = ""
+    end
+
+    def process_lines(request_lines)
+      @verb     = request_lines[1][0]
+      @path     = request_lines[1][1]
+      @protocol = request_lines[1][2]
+      @host     = request_lines.last[1].split(':')[0]
+      @port     = request_lines.last[1].split(':')[1]
+      @origin   = request_lines.last[1].split(':')[0]
+      @accept   = request_lines[0][1]
+    end
+  end
+
+  def diagnostic_template(response)
     "<pre>" \
-      "Verb: #{normalized_lines[1][0]}\n" \
-      "Path: #{normalized_lines[1][1]}\n" \
-      "Protocol: #{normalized_lines[1][2]}\n" \
-      "Host: #{normalized_lines.last[1].split(':')[0]}\n" \
-      "Port: #{normalized_lines.last[1].split(':')[1]}\n" \
-      "Origin: #{normalized_lines.last[1].split(':')[0]}\n" \
-      "Accept: #{normalized_lines[0][1]}" \
+      "Verb: #{response.verb}\n" \
+      "Path: #{response.path}\n" \
+      "Protocol: #{response.protocol}\n" \
+      "Host: #{response.host}\n" \
+      "Port: #{response.port}\n" \
+      "Origin: #{response.origin}\n" \
+      "Accept: #{response.accept}" \
     "</pre>"
   end
 
@@ -23,21 +47,20 @@ module ResponseHandler
     end
   end
 
-  def check_path(normalized_lines)
-    path = normalized_lines[1][1]
-    if path == "/"
-      "#{diagnostic_template(normalized_lines)}"
-    elsif path == "/hello"
+  def check_path(response)
+    if response.path == "/"
+      "#{diagnostic_template(response)}"
+    elsif response.path == "/hello"
       @hello_count += 1
       "<p>Hello, World! (#{hello_count - 1})</p>"
-    elsif path == "/datetime"
+    elsif response.path == "/datetime"
       datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
       "<p>#{datetime}</p>"
-    elsif path.include?("word_search")
-      search_word(path)
-    elsif path == "/clear_count"
+    elsif response.path.include?("word_search")
+      search_word(response.path)
+    elsif response.path == "/clear_count"
       reset_count
-    elsif path == "/shutdown"
+    elsif response.path == "/shutdown"
       @close_server = true
       "<p>Total Requests: #{request_count}</p>"
     end
@@ -45,7 +68,9 @@ module ResponseHandler
 
   def format_response(normalized_lines)
     @request_count += 1
-    response = check_path(normalized_lines)
+    response = Response.new
+    response.process_lines(normalized_lines)
+    response = check_path(response)
     output  = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
