@@ -18,6 +18,8 @@ module ResponseHandler
     found = dictionary.any? { |dict_word| word == dict_word }
     if found
       "<p>#{word} is a known word</p>"
+    else
+      "<p>#{word} is not a known word</p>"
     end
   end
 

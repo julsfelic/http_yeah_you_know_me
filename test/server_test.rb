@@ -118,6 +118,8 @@ class ServerTest < Minitest::Test
   end
 
   def test_outputs_not_known_when_word_search_path_is_requested
-    skip
+    response = Hurley.get("http://127.0.0.1:9292/word_search?word=centower")
+    expected = "<html><head></head><body><p>centower is not a known word</p></body></html>"
+    assert_equal expected, response.body
   end
 end
