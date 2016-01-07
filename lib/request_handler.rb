@@ -11,11 +11,7 @@ module RequestHandler
   end
 
   def parsed_request
-    request_lines = []
-    while line = client.gets and !line.chomp.empty?
-      request_lines << line.chomp
-    end
-    request_lines
+    client.recv(1024).split("\r\n")
   end
 
   def process_request
