@@ -121,10 +121,16 @@ class ServerTest < Minitest::Test
     expected = "<html><head></head><body><p>centower is not a known word</p></body></html>"
     assert_equal expected, response.body
   end
-  
+
   def test_outputs_good_luck_when_post_to_start_game
     response = Hurley.post("http://127.0.0.1:9292/start_game")
     expected = "<html><head></head><body><p>Good luck!</p></body></html>"
+    assert_equal expected, response.body
+  end
+
+  def test_outputs_zero_guesses_when_we_get_game
+    response = Hurley.get("http://127.0.0.1:9292/game")
+    expected = "<html><head></head><body><p>0 guesses taken</p></body></html>"
     assert_equal expected, response.body
   end
 end
