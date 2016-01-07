@@ -16,8 +16,8 @@ class Response
     @path     = request_lines[1][1]
     @protocol = request_lines[1][2]
     @host     = request_lines.last[1].split(':')[0]
+    @origin   = host
     @port     = request_lines.last[1].split(':')[1]
-    @origin   = request_lines.last[1].split(':')[0]
     @accept   = request_lines[0][1]
   end
 end
