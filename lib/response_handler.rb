@@ -12,6 +12,15 @@ module ResponseHandler
     "</pre>"
   end
 
+  def search_word(path)
+    word = path.split("=").last
+    dictionary = File.read("/usr/share/dict/words").split("\n")
+    found = dictionary.any? { |dict_word| word == dict_word }
+    if found
+      "<p>#{word} is a known word</p>"
+    end
+  end
+
   def check_path(normalized_lines)
     path = normalized_lines[1][1]
     if path == "/"
@@ -19,11 +28,13 @@ module ResponseHandler
     elsif path == "/hello"
       @hello_count += 1
       "<p>Hello, World! (#{hello_count - 1})</p>"
-    elsif path == "/clear_count"
-      reset_count
     elsif path == "/datetime"
       datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
       "<p>#{datetime}</p>"
+    elsif path.include?("word_search")
+      search_word(path)
+    elsif path == "/clear_count"
+      reset_count
     elsif path == "/shutdown"
       @close_server = true
       "<p>Total Requests: #{request_count}</p>"
