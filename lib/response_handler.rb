@@ -44,11 +44,15 @@ module ResponseHandler
     end
   end
 
-  def format_response(normalized_lines)
-    @request_count += 1
+  def format_response(formatted_lines)
     response = Response.new
-    response.process_lines(normalized_lines)
-    response = check_path(response)
+    response.process_lines(formatted_lines)
+    response
+  end
+
+  def process_response(request)
+    formatted_response = format_response(request)
+    response = check_path(formatted_response)
     output  = "<html><head></head><body>#{response}</body></html>"
     headers = ["http/1.1 200 ok",
                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
@@ -57,5 +61,4 @@ module ResponseHandler
                "content-length: #{output.length}\r\n\r\n"].join("\r\n")
     send_response(output: output, headers: headers)
   end
-
 end
