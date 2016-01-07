@@ -45,6 +45,8 @@ module ResponseHandler
       "<p>#{datetime}</p>"
     elsif response.path.include?("word_search")
       search_word(response.path)
+    elsif response.path == "/start_game"
+      "<p>Good luck!</p>"
     elsif response.path == "/clear_count"
       reset_count
     elsif response.path == "/shutdown"
