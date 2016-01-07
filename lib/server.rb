@@ -33,6 +33,7 @@ class Server
     loop do
       @client = tcp_server.accept
       parse_request
+      break if close_server
     end
   end
 end
