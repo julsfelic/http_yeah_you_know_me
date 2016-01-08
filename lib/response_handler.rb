@@ -53,7 +53,7 @@ module ResponseHandler
     if response.verb == "GET"
       game.run_game
     elsif response.verb == "POST"
-      game.give_guess
+      game.give_guess(response)
     end
   end
 

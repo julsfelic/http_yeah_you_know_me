@@ -33,7 +33,6 @@ class Response
                "content-type: text/html; charset=iso-8859-1",
                "content-length: #{output_length}"]
     headers << "Location: HTTP://127.0.0.1:9292/game" if status_code == "302 Found"
-    headers << "Connection: keep-alive"
     headers.join("\r\n") + "\r\n\r\n"
   end
 end

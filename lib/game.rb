@@ -26,7 +26,7 @@ class Game
     end
   end
 
-  def give_guess
+  def give_guess(response)
     @guessed_num    = response.guess
     @guessed_count += 1
     response.status_code = "302 Found"

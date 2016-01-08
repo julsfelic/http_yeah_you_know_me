@@ -1,8 +1,8 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "pry"
 require "socket"
-require 'request_handler'
-require 'response_handler'
+require "request_handler"
+require "response_handler"
 
 class Server
   include RequestHandler, ResponseHandler
