@@ -23,7 +23,9 @@ class Response
     @origin   = host
     @port     = request_lines[2][1].split(':')[1]
     @accept   = request_lines[0][1]
-    @guess    = request_lines.last[0].split("=").last.to_i
+    unless request_lines.last[0].split("=").last.to_i == 0
+      @guess = request_lines.last[0].split("=").last.to_i
+    end
     self
   end
 

@@ -8,8 +8,8 @@ class Server
   include RequestHandler, ResponseHandler
   attr_accessor :goal
   attr_reader :tcp_server, :client, :hello_count,
-              :request_count, :close_server, :redirect, :guessed_num,
-              :guessed_count
+              :request_count, :close_server, :redirect,
+              :game
 
   def initialize
     @tcp_server     = TCPServer.new(9292)
@@ -17,9 +17,7 @@ class Server
     @hello_count    = 0
     @request_count  = 0
     @close_server   = false
-    @guessed_num    = nil
-    @guessed_count  = 0
-    @goal           = nil
+    @game           = nil
   end
 
   def send_response(response, args)
@@ -29,8 +27,8 @@ class Server
   end
 
   def reset_count
-    @hello_count = 0
-    @request_count = 0
+    @hello_count    = 0
+    @request_count  = 0
   end
 
   def start_server
