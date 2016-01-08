@@ -4,13 +4,6 @@ class Response
               :accept, :guess
 
   def initialize
-    @verb        = ""
-    @path        = ""
-    @protocol    = ""
-    @host        = ""
-    @port        = ""
-    @origin      = ""
-    @accept      = ""
     @status_code = "200 ok"
     @guess       = nil
   end
