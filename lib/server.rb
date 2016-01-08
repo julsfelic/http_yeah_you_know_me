@@ -1,20 +1,21 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require "pry"
 require "socket"
-require 'request_handler'
-require 'response_handler'
+require "request_handler"
+require "response_handler"
 
 class Server
   include RequestHandler, ResponseHandler
+  attr_accessor :hello_count, :request_count
+  attr_reader :tcp_server, :client, :close_server, :game
 
-  attr_reader :tcp_server, :client, :hello_count, :request_count, :close_server
-
-  def initialize
-    @tcp_server     = TCPServer.new(9292)
+  def initialize(port = 9292)
+    @tcp_server     = TCPServer.new(port)
     @client         = nil
     @hello_count    = 0
     @request_count  = 0
     @close_server   = false
+    @game           = nil
   end
 
   def send_response(args)
@@ -24,8 +25,8 @@ class Server
   end
 
   def reset_count
-    @hello_count = 0
-    @request_count = 0
+    @hello_count    = 0
+    @request_count  = 0
   end
 
   def start_server

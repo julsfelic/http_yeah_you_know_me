@@ -1,4 +1,5 @@
-require 'response'
+require "response"
+require "game"
 
 module ResponseHandler
 
@@ -14,13 +15,9 @@ module ResponseHandler
     "</pre>"
   end
 
-  def search_word(path)
-    # get word?????
+  def lookup_word(path)
     word = path.split("=").last
-    # dictionary method
     dictionary = File.read("/usr/share/dict/words").split("\n")
-    # maybe have getting the word together with finding word
-    # find word method?, get rid of found and return value
     found = dictionary.any? { |dict_word| word == dict_word }
     if found
       "<p>#{word} is a known word</p>"
@@ -29,27 +26,50 @@ module ResponseHandler
     end
   end
 
+  def clear_count
+    reset_count
+  end
+
+  def hello
+    @hello_count += 1
+    "<p>Hello, World! (#{hello_count - 1})</p>"
+  end
+
+  def datetime
+    datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
+    "<p>#{datetime}</p>"
+  end
+
+  def word_search(response)
+    lookup_word(response.path)
+  end
+
+  def start_game
+    @game = Game.new
+    "<p>Good luck!</p>"
+  end
+
+  def play_game(response)
+    if response.verb == "GET"
+      game.run_game
+    elsif response.verb == "POST"
+      game.give_guess(response)
+    end
+  end
+
+  def shutdown
+    @close_server = true
+    "<p>Total Requests: #{request_count}</p>"
+  end
+
   def check_path(response)
-    # get path string
-    # remove backslash
-    # convert to a sym
-    # just call send with sym
-    # break out into small methods named after the path
     if response.path == "/"
       "#{diagnostic_template(response)}"
-    elsif response.path == "/hello"
-      @hello_count += 1
-      "<p>Hello, World! (#{hello_count - 1})</p>"
-    elsif response.path == "/datetime"
-      datetime = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
-      "<p>#{datetime}</p>"
     elsif response.path.include?("word_search")
-      search_word(response.path)
-    elsif response.path == "/clear_count"
-      reset_count
-    elsif response.path == "/shutdown"
-      @close_server = true
-      "<p>Total Requests: #{request_count}</p>"
+      word_search(response)
+    else
+      path = response.path.delete("/").to_sym
+      path == :game ? play_game(response) : send(path)
     end
   end
 
@@ -59,16 +79,10 @@ module ResponseHandler
   end
 
   def process_response(request)
-    # should probably be named response
-    formatted_response = format_response(request)
-    # maybe flip names
-    response = check_path(formatted_response)
-    output  = "<html><head></head><body>#{response}</body></html>"
-    headers = ["http/1.1 200 ok",
-               "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-               "server: ruby",
-               "content-type: text/html; charset=iso-8859-1",
-               "content-length: #{output.length}\r\n\r\n"].join("\r\n")
+    response = format_response(request)
+    output_body = check_path(response)
+    output = response.build_output(output_body)
+    headers = response.build_headers(output.length)
     send_response(output: output, headers: headers)
   end
 end
