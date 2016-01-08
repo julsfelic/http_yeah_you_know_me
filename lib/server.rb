@@ -6,13 +6,11 @@ require "response_handler"
 
 class Server
   include RequestHandler, ResponseHandler
-  attr_accessor :goal
-  attr_reader :tcp_server, :client, :hello_count,
-              :request_count, :close_server, :redirect,
-              :game
+  attr_accessor :hello_count, :request_count
+  attr_reader :tcp_server, :client, :close_server, :game
 
-  def initialize
-    @tcp_server     = TCPServer.new(9292)
+  def initialize(port=9292)
+    @tcp_server     = TCPServer.new(port)
     @client         = nil
     @hello_count    = 0
     @request_count  = 0
