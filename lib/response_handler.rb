@@ -29,6 +29,16 @@ module ResponseHandler
     end
   end
 
+  def guess_checker
+    guessed_num <=> goal
+  end
+
+  def reset_game
+    @guessed_num    = nil
+    @guessed_count  = 0
+    @goal           = nil
+  end
+
   def check_path(response)
     # get path string
     # remove backslash
@@ -46,9 +56,28 @@ module ResponseHandler
     elsif response.path.include?("word_search")
       search_word(response.path)
     elsif response.path == "/start_game"
+      @goal = 25
       "<p>Good luck!</p>"
     elsif response.path == "/game"
-      "<p>0 guesses taken</p>"
+      if response.verb == "GET"
+        guess_msg = "<p>Guess count: #{guessed_count}</p>"
+        check_result = guess_checker
+        if check_result == -1
+          guess_msg += "<p>Guess was too low!</p>"
+        elsif check_result == 0
+          # reset shit
+          reset_game
+          guess_msg += "<p>You guessed correctly! (Game reset)</p>"
+        elsif check_result == 1
+          guess_msg += "<p>Guess was too high!</p>"
+        else
+          guess_msg
+        end
+      else
+        @guessed_num    = response.guess
+        @guessed_count += 1
+        response.status_code = "302 Found"
+      end
     elsif response.path == "/clear_count"
       reset_count
     elsif response.path == "/shutdown"
@@ -64,15 +93,17 @@ module ResponseHandler
 
   def process_response(request)
     # should probably be named response
-    formatted_response = format_response(request)
+    response = format_response(request)
     # maybe flip names
-    response = check_path(formatted_response)
-    output  = "<html><head></head><body>#{response}</body></html>"
-    headers = ["http/1.1 200 ok",
-               "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-               "server: ruby",
-               "content-type: text/html; charset=iso-8859-1",
-               "content-length: #{output.length}\r\n\r\n"].join("\r\n")
-    send_response(output: output, headers: headers)
+    output_body = check_path(response)
+    # output  = "<html><head></head><body>#{output_body}</body></html>"
+    output = response.build_output(output_body)
+    headers = response.build_headers(output.length)
+    # headers = ["http/1.1 #{status_code}",
+    #            "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
+    #            "server: ruby",
+    #            "content-type: text/html; charset=iso-8859-1",
+    #            "content-length: #{output.length}\r\n\r\n"].join("\r\n")
+    send_response(response, output: output, headers: headers)
   end
 end

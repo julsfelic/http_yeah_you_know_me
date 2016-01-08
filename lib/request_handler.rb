@@ -1,14 +1,18 @@
 module RequestHandler
 
   def normalized_request(parsed_request)
-    keys = ["HTTP/1.1", "Host", "Accept:"]
+    keys = ["HTTP/1.1", "Host", "Accept:", "guess"]
     key_lines = parsed_request.select do |line|
       keys.any? do |key|
         line.include?(key)
       end
     end
     formatted_header = key_lines.map { |line| line.split(" ") }
-    [formatted_header[1], formatted_header[0], formatted_header[2]]
+    if key_lines.last.include?("guess")
+      [formatted_header[1], formatted_header[0], formatted_header[2], formatted_header[3]]
+    else
+      [formatted_header[1], formatted_header[0], formatted_header[2]]
+    end
   end
 
   def parsed_request

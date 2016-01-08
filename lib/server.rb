@@ -6,8 +6,10 @@ require 'response_handler'
 
 class Server
   include RequestHandler, ResponseHandler
-
-  attr_reader :tcp_server, :client, :hello_count, :request_count, :close_server
+  attr_accessor :goal
+  attr_reader :tcp_server, :client, :hello_count,
+              :request_count, :close_server, :redirect, :guessed_num,
+              :guessed_count
 
   def initialize
     @tcp_server     = TCPServer.new(9292)
@@ -15,9 +17,12 @@ class Server
     @hello_count    = 0
     @request_count  = 0
     @close_server   = false
+    @guessed_num    = nil
+    @guessed_count  = 0
+    @goal           = nil
   end
 
-  def send_response(args)
+  def send_response(response, args)
     client.puts args[:headers]
     client.puts args[:output]
     client.close

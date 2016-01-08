@@ -101,7 +101,7 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  def test_server_shuts_down_after_a_shutdown_request
+  def test_shuts_down_after_a_shutdown_request
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.get "/shutdown"
 
@@ -130,7 +130,20 @@ class ServerTest < Minitest::Test
 
   def test_outputs_zero_guesses_when_we_get_game
     response = Hurley.get("http://127.0.0.1:9292/game")
-    expected = "<html><head></head><body><p>0 guesses taken</p></body></html>"
+    expected = "<html><head></head><body><p>Guess count: 0</p></body></html>"
     assert_equal expected, response.body
   end
+
+  def test_post_to_game_returns_a_303_status
+    skip
+    response = Hurley.post("http://127.0.0.1:9292/game")
+
+    assert response.redirection?
+  end
+
+  # def test_redirects_to_get_game_when_we_post_to_game
+  #   response = Hurley.post("http://127.0.0.1:9292/game")
+  #
+  # end
+
 end
