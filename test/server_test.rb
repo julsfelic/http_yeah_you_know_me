@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class ServerTest < Minitest::Test
 
@@ -79,14 +79,17 @@ class ServerTest < Minitest::Test
     assert_equal expected, response.body
   end
 
-  def test_shuts_down_after_a_shutdown_request
+  def test_total_requests_increments_after_each_request
+    clear_count
     client = Hurley::Client.new "http://127.0.0.1:9292"
-    client.get "/shutdown"
+    client.get "/"
+    client.get "/hello"
+    client.get "/datetime"
+    response = client.get "/shutdown"
+    expected = "<html><head></head><body><p>Total Requests: 4</p></body></html>"
 
-    assert_raises Hurley::ConnectionFailed do
-      client.get "/hello"
-    end
-  end
+    assert_equal expected, response.body
+end
 
   def test_outputs_known_word_when_word_search_path_is_requested
     response = Hurley.get("http://127.0.0.1:9292/word_search?word=pizza")
