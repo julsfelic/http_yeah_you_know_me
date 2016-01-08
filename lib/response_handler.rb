@@ -51,21 +51,9 @@ module ResponseHandler
 
   def play_game(response)
     if response.verb == "GET"
-      guess_msg = "<p>Guess count: #{game.guessed_count}</p>"
-      check_result = game.guess_checker
-      if check_result == -1
-        guess_msg += "<p>Guess was too low!</p>"
-      elsif check_result == 0
-        guess_msg += "<p>You guessed correctly! (Game reset)</p>"
-      elsif check_result == 1
-        guess_msg += "<p>Guess was too high!</p>"
-      else
-        guess_msg
-      end
+      game.run_game
     elsif response.verb == "POST"
-      @game.guessed_num    = response.guess
-      @game.guessed_count += 1
-      response.status_code = "302 Found"
+      game.give_guess
     end
   end
 

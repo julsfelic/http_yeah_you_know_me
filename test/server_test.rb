@@ -36,7 +36,7 @@ class ServerTest < Minitest::Test
   def test_outputs_hello_world_when_hello_is_requested
     clear_count
     response = Hurley.get("http://127.0.0.1:9292/hello")
-    expected = "<html><head></head><body><p>Hello, World! (0)</p></body></html>"
+    expected = wrapper("<p>Hello, World! (0)</p>")
 
     assert_equal expected, response.body
   end
@@ -48,7 +48,7 @@ class ServerTest < Minitest::Test
     client.get "/hello"
     client.get "/hello"
     response = client.get "/hello"
-    expected = "<html><head></head><body><p>Hello, World! (3)</p></body></html>"
+    expected = wrapper("<p>Hello, World! (3)</p>")
 
     assert_equal expected, response.body
   end
@@ -59,14 +59,14 @@ class ServerTest < Minitest::Test
     client.get "/hello"
     client.get "/hello"
     response = client.get "/hello"
-    expected = "<html><head></head><body><p>Hello, World! (2)</p></body></html>"
+    expected = wrapper("<p>Hello, World! (2)</p>")
 
     assert_equal expected, response.body
 
     client.get "/"
     client.get "/"
     response = client.get "/hello"
-    expected = "<html><head></head><body><p>Hello, World! (3)</p></body></html>"
+    expected = wrapper("<p>Hello, World! (3)</p>")
 
     assert_equal expected, response.body
   end
@@ -74,7 +74,7 @@ class ServerTest < Minitest::Test
   def test_outputs_formatted_date_when_datetime_is_requested
     response = Hurley.get("http://127.0.0.1:9292/datetime")
     expected_time = Time.now.strftime("%I:%M%p on %A, %B %d, %Y")
-    expected = "<html><head></head><body><p>#{expected_time}</p></body></html>"
+    expected = wrapper("<p>#{expected_time}</p>")
 
     assert_equal expected, response.body
   end
@@ -90,26 +90,30 @@ class ServerTest < Minitest::Test
 
   def test_outputs_known_word_when_word_search_path_is_requested
     response = Hurley.get("http://127.0.0.1:9292/word_search?word=pizza")
-    expected = "<html><head></head><body><p>pizza is a known word</p></body></html>"
+    expected = wrapper("<p>pizza is a known word</p>")
+
     assert_equal expected, response.body
   end
 
   def test_outputs_not_known_when_word_search_path_is_requested
     response = Hurley.get("http://127.0.0.1:9292/word_search?word=centower")
-    expected = "<html><head></head><body><p>centower is not a known word</p></body></html>"
+    expected = wrapper("<p>centower is not a known word</p>")
+
     assert_equal expected, response.body
   end
 
   def test_outputs_good_luck_when_post_to_start_game
     response = Hurley.post("http://127.0.0.1:9292/start_game")
-    expected = "<html><head></head><body><p>Good luck!</p></body></html>"
+    expected = wrapper("<p>Good luck!</p>")
+
     assert_equal expected, response.body
   end
 
   def test_outputs_zero_guesses_when_we_get_game
     Hurley.post("http://127.0.0.1:9292/start_game")
     response = Hurley.get("http://127.0.0.1:9292/game")
-    expected = "<html><head></head><body><p>Guess count: 0</p></body></html>"
+    expected = wrapper("<p>Guess count: 0</p>")
+
     assert_equal expected, response.body
   end
 end
