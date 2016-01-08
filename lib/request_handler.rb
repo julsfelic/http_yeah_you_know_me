@@ -12,9 +12,10 @@ module RequestHandler
   def normalized_request(parsed_request)
     key_lines = get_key_lines(parsed_request)
     formatted_header = key_lines.map { |line| line.split(" ") }
-    formatted_header.sort_by! { |a| a.count }
+    formatted_header.sort_by!(&:count)
     if key_lines.last.include?("guess")
-      [formatted_header[1], formatted_header[3], formatted_header[2], formatted_header[0]]
+      [formatted_header[1], formatted_header[3],
+       formatted_header[2], formatted_header[0]]
     else
       [formatted_header[0], formatted_header[2], formatted_header[1]]
     end

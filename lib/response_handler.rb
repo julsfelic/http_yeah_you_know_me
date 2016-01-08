@@ -83,6 +83,6 @@ module ResponseHandler
     output_body = check_path(response)
     output = response.build_output(output_body)
     headers = response.build_headers(output.length)
-    send_response(response, output: output, headers: headers)
+    send_response(output: output, headers: headers)
   end
 end
