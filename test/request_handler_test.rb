@@ -12,9 +12,9 @@ class RequestHandlerTest < Minitest::Test
                       "Connection: close",
                       "Host: 127.0.0.1:9292"]
     normalized_request = server.normalized_request(parsed_request)
-    expected = [["Accept:", "*/*"],
+    expected = [["Host:", "127.0.0.1:9292"],
                 ["GET", "/", "HTTP/1.1"],
-                ["Host:", "127.0.0.1:9292"]]
+                ["Accept:", "*/*"]]
 
     assert_equal expected, normalized_request
   end

@@ -12,27 +12,6 @@ class ServerAcceptanceTest < Minitest::Test
     assert response.success?
   end
 
-  def test_outputs_formatted_diagnostic_when_root_is_requested
-    client = Hurley::Client.new "http://127.0.0.1:9292"
-    client.header[:accept] = "text/html,application/xhtml+xml,application/xml;" \
-                             "q=0.9,image/webp,*/*;q=0.8"
-    response = client.get "/"
-    # set accept before response
-    expected = "<html><head></head><body>" \
-               "<pre>" \
-               "Verb: GET\n" \
-               "Path: /\n" \
-               "Protocol: HTTP/1.1\n" \
-               "Host: 127.0.0.1\n" \
-               "Port: 9292\n" \
-               "Origin: 127.0.0.1\n" \
-               "Accept: text/html,application/xhtml+xml,application/xml;" \
-               "q=0.9,image/webp,*/*;q=0.8" \
-               "</pre></body></html>"
-
-    assert_equal expected, response.body
-  end
-
   def test_outputs_hello_world_when_hello_is_requested
     clear_count
     response = Hurley.get("http://127.0.0.1:9292/hello")
@@ -78,19 +57,6 @@ class ServerAcceptanceTest < Minitest::Test
 
     assert_equal expected, response.body
   end
-
-  def test_total_requests_increments_after_each_request
-    skip
-    clear_count
-    client = Hurley::Client.new "http://127.0.0.1:9292"
-    client.get "/"
-    client.get "/hello"
-    client.get "/datetime"
-    response = client.get "/shutdown"
-    expected = "<html><head></head><body><p>Total Requests: 4</p></body></html>"
-
-    assert_equal expected, response.body
-end
 
   def test_outputs_known_word_when_word_search_path_is_requested
     response = Hurley.get("http://127.0.0.1:9292/word_search?word=pizza")
