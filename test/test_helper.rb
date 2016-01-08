@@ -1,4 +1,5 @@
 require 'minitest'
+require "mocha/mini_test"
 require 'simplecov'
 SimpleCov.start
 require 'hurley'

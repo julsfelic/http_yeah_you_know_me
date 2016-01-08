@@ -80,6 +80,7 @@ class ServerAcceptanceTest < Minitest::Test
   end
 
   def test_total_requests_increments_after_each_request
+    skip
     clear_count
     client = Hurley::Client.new "http://127.0.0.1:9292"
     client.get "/"

@@ -11,8 +11,11 @@ GEM
     hurley (0.2)
     interception (0.5)
     json (1.8.3)
+    metaclass (0.0.4)
     method_source (0.8.2)
     minitest (5.8.3)
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
     mrspec (0.2.3)
       minitest (~> 5.0)
       rspec-core (~> 3.0)
@@ -44,6 +47,7 @@ PLATFORMS
 DEPENDENCIES
   codeclimate-test-reporter
   hurley
+  mocha
   mrspec
   pry
   pry-nav
