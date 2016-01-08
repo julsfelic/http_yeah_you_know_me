@@ -9,7 +9,7 @@ class GameTest < Minitest::Test
     assert_instance_of Game, game
   end
 
-  def test_contains_defautl_instance_variables
+  def test_contains_default_instance_variables
     game = Game.new
 
     assert_equal 25, game.goal
