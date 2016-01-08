@@ -12,9 +12,9 @@ class Response
     @verb     = request_lines[1][0]
     @path     = request_lines[1][1]
     @protocol = request_lines[1][2]
-    @host     = request_lines[2][1].split(':')[0]
+    @host     = request_lines[2][1].split(":")[0]
     @origin   = host
-    @port     = request_lines[2][1].split(':')[1]
+    @port     = request_lines[2][1].split(":")[1]
     @accept   = request_lines[0][1]
     unless request_lines.last[0].split("=").last.to_i == 0
       @guess = request_lines.last[0].split("=").last.to_i

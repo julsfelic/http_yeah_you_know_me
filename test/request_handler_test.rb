@@ -2,7 +2,6 @@ require "test_helper"
 require "server"
 
 class RequestHandlerTest < Minitest::Test
-
   def test_normalizes_requests
     server = Server.new
     parsed_request = ["GET / HTTP/1.1",

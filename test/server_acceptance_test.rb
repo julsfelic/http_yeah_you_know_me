@@ -1,7 +1,6 @@
 require "test_helper"
 
 class ServerAcceptanceTest < Minitest::Test
-
   def self.test_order
     :alpha
   end

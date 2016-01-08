@@ -1,5 +1,5 @@
-require 'response'
-require 'game'
+require "response"
+require "game"
 
 module ResponseHandler
 

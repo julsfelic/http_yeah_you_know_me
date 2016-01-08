@@ -9,7 +9,7 @@ class Server
   attr_accessor :hello_count, :request_count
   attr_reader :tcp_server, :client, :close_server, :game
 
-  def initialize(port=9292)
+  def initialize(port = 9292)
     @tcp_server     = TCPServer.new(port)
     @client         = nil
     @hello_count    = 0
@@ -18,7 +18,7 @@ class Server
     @game           = nil
   end
 
-  def send_response(response, args)
+  def send_response(args)
     client.puts args[:headers]
     client.puts args[:output]
     client.close

@@ -35,10 +35,10 @@ class ResponseTest < Minitest::Test
   def test_builds_headers
     response = Response.new
     expected = ["HTTP/1.1 200 ok",
-               "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
-               "server: ruby",
-               "content-type: text/html; charset=iso-8859-1",
-               "content-length: 10"].join("\r\n") + "\r\n\r\n"
+                "date: #{Time.now.strftime('%a, %e %b %Y %H:%M:%S %z')}",
+                "server: ruby",
+                "content-type: text/html; charset=iso-8859-1",
+                "content-length: 10"].join("\r\n") + "\r\n\r\n"
 
     assert_equal expected, response.build_headers(10)
   end
